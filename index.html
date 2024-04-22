@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+    <h1>MAKEUP</h1>
+    <p>It is very important for the customer to pay attention to the adipiscing process. Whoever, when he was freed from him, would criticize them for rejecting the whole of those who were born without duties, and suffering from what he had suffered.</p>
+    <div class="loader"></div>
+    <div id="cards">
+        <div class="card">
+
+        </div>
+    </div>
+    <div class="pagination">
+        <button id="firstbtn">First Page</button>
+        <button id="prevBtn">Previous</button>
+        <button id="nextBtn">Next</button>
+        <button id="lastbtn">Last page</button>
+    </div>
+</div>
+
+
+    <script>
+         let itemsPerPage = 12;
+            let currentPage = 1;
+            const productData = [];
+
+            let totalPage = Math.ceil(productData.length / itemsPerPage)
+
+
+            const loader = document.querySelector(".loader");
+            const card = document.querySelector(".card");
+        async function fetchProduct () {
+            try{
+
+                console.log(productData);
+            
+            if (productData == undefined)
+            {
+                showLoading();
+                const response = await fetch('https://makeup-api.herokuapp.com/api/v1/products.json');
+                const data = await response.json();
+                var productData = data;
+                totalPage = Math.ceil(productData.length / itemsPerPage);
+                console.log("loading completed");
+                hideLoading();
+            }
+            
+            const lastIndexOfCurrentPage = currentPage * itemsPerPage;
+            const startIndexOfCurrentPage = lastIndexOfCurrentPage - itemsPerPage;
+            const currentItems = productData.slice(startIndexOfCurrentPage, lastIndexOfCurrentPage);
+           
+            let values = "";
+            currentItems.map((products)=>{
+                values+=`<div class="card">
+                    <img src=${products.image_link} alt="pic" class="images" />
+                    <h3 class="name">${products.name}</h3>
+                    <h4 class="price">${products.price}</h4>
+                    <h5 class="description">${products.description}</h5>
+                    </div>`;
+            }).join("");
+            document.getElementById("cards").innerHTML=values;
+            } catch(error){
+                console.log(error);
+            }
+            
+        }
+        fetchProduct();
+
+        const prevBtn = () => {
+            
+            if((currentPage -1) > 0){
+                currentPage--;
+                console.log("total page "+totalPage);
+            console.log(currentPage);
+                document.documentElement.scrollTop = 0;
+                fetchProduct();
+            }
+            else{
+                alert("This is the first page")
+            }
+        }
+        const nextBtn = () => {
+            
+            if(currentPage + 1 <= totalPage){
+                currentPage++;
+                console.log("total page "+totalPage);
+            console.log(currentPage);
+                document.documentElement.scrollTop = 0;
+                fetchProduct();
+            }
+            else{
+                alert("This is last page.")
+            }
+        }
+
+        const firstbtn = () => {
+            
+            currentPage = 1;
+            console.log("total page "+totalPage);
+            console.log(currentPage);
+            document.documentElement.scrollTop = 0;
+            fetchProduct();
+        }
+
+        const lastbtn = () =>{
+            currentPage = totalPage;
+            console.log("total page "+totalPage);
+            console.log(currentPage);
+            document.documentElement.scrollTop = 0;
+            fetchProduct();
+
+        }
+
+        document.getElementById("firstbtn").addEventListener("click", firstbtn, false)
+        document.getElementById("prevBtn").addEventListener("click", prevBtn, false)
+        document.getElementById("nextBtn").addEventListener("click", nextBtn, false)
+        document.getElementById("lastbtn").addEventListener("click", lastbtn, false)
+
+        function showLoading()
+        {
+            loader.classList.remove("hide");
+        }
+
+        function hideLoading()
+        {
+            loader.classList.add("hide");
+        }
+    </script>
+</body>
+</html>
